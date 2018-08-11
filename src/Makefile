@@ -30,10 +30,10 @@ LFU = 0xef
 HFU = 0xD9
 EFU = 0xfd
 # program source files (not including external libraries)
-SRC =
+SRC = 
 # where to look for external libraries (consisting of .c/.cpp files and .h files)
 # e.g. EXT = ../../EyeToSee ../../YouSART
-EXT = ../src ../../avr-sound/src
+EXT = . ../../avr-sound/src
 
 
 #################################################################################################
