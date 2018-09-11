@@ -20,6 +20,12 @@ PRJ = main
 MCU = atmega328p
 # mcu clock frequency
 F_CPU = 16000000
+
+ifndef DEVICE_ID
+$(DEVICE_ID is set to 1)
+DEVICE_ID=1
+endif
+
 # avr programmer (and port if necessary)
 # e.g. PRG = usbtiny -or- PRG = arduino -P /dev/tty.usbmodem411
 PRG = avrisp2
@@ -43,7 +49,7 @@ EXT = . ../../avr-sound/src
 # include path
 INCLUDE := $(foreach dir, $(EXT), -I$(dir))
 # c flags
-CFLAGS    = -std=c99 -Wall -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU) $(INCLUDE)
+CFLAGS    = -std=c99 -Wall -Os -DF_CPU=$(F_CPU) -DDEVICE_ID=$(DEVICE_ID) -mmcu=$(MCU) $(INCLUDE)
 # any aditional flags for c++
 CPPFLAGS =
 

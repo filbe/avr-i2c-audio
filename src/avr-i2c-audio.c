@@ -7,7 +7,6 @@
 #include "arpeggio.h"
 #include "chords.h"
 
-#define DEVICE_ID 2
 
 float midi[140];
 
@@ -40,6 +39,9 @@ void receive_i2c()
 	case 0x01: // NOTE ON CHANNEL N
 		avrsound_set_hz(channel, midi[note[0]]);
 		break;
+	case 0x02: // HZ ON CHANNEL N
+		avrsound_set_hz(channel, ((twi_rxBuffer[2] *256) + twi_rxBuffer[3]) + twi_rxBuffer[4] / 256.0);
+		break;
 	case 0x10: // SET OSCILLATOR TO SQUARE WAVE
 		for (uint16_t b = 0; b < 256; b++) {
 			avrsound_setbuffer(b, (b < 128) * 255); // SQUARE WAVE
@@ -52,12 +54,12 @@ void receive_i2c()
 		break;
 	case 0x12: // SET OSCILLATOR TO SINE WAVE
 		for (uint16_t b = 0; b < 256; b++) {
-			avrsound_setbuffer(b, sin(2 * b / 256.0 * M_PI) * 127 + 127); // SINE WAVE
+			avrsound_setbuffer(b, sin(2 * b / 256.0 * M_PI) * 127 + 128); // SINE WAVE
 		}
 		break;
 	case 0x13: // SET OSCILLATOR TO WHITE NOISE
 		for (uint16_t b = 0; b < 256; b++) {
-			avrsound_setbuffer(b, rand() / 2);
+			avrsound_setbuffer(b, rand());
 		}
 		break;
 	case 0x20: // FINE TUNE
@@ -68,6 +70,9 @@ void receive_i2c()
 		avrsound_setbuffer((twi_rxBuffer[2] << 8) + twi_rxBuffer[3], twi_rxBuffer[4]);
 		break;
 
+	case 0x41: // set channel volume
+		avrsound_set_volume(twi_rxBuffer[2], twi_rxBuffer[3]);
+		break;
 
 	case 0x51: // note arpeggio
 		notescount = twi_rxBuffer[2];
