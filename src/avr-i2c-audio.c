@@ -1,14 +1,10 @@
-#include <avr-sound.h>
 #include <avr-i2c-audio.h>
-#include <twi.h>
-#include <math.h>
-#include <stdlib.h>
-#include <util/delay.h>
-#include "arpeggio.h"
-#include "chords.h"
 
 
 float midi[140];
+volatile uint8_t channel_fading[AVRSOUND_MAX_CHANNELS];
+
+#define CHANNEL_FADE_SETTING	3
 
 void play_triplet(uint8_t *notes)
 {
@@ -20,6 +16,8 @@ void play_triplet(uint8_t *notes)
 void receive_i2c()
 {
 	uint8_t channel = twi_rxBuffer[0];
+	uint8_t channel_settings = channel >> 4;
+	channel = channel & 0x0f;
 	uint8_t command = twi_rxBuffer[1];
 	uint8_t note[8];
 	uint8_t notedelay;
@@ -33,14 +31,18 @@ void receive_i2c()
 				avrsound_set_hz(channel, 0);
 			}
 		} else {
-			avrsound_set_hz(channel, 0);
+			
+			if (channel_settings & (1 << CHANNEL_FADE_SETTING)) {
+			} else {
+				avrsound_set_hz(channel, 0);
+			}
 		}
 		break;
 	case 0x01: // NOTE ON CHANNEL N
 		avrsound_set_hz(channel, midi[note[0]]);
 		break;
 	case 0x02: // HZ ON CHANNEL N
-		avrsound_set_hz(channel, ((twi_rxBuffer[2] *256) + twi_rxBuffer[3]) + twi_rxBuffer[4] / 256.0);
+		avrsound_set_hz(channel, ((twi_rxBuffer[2] * 256) + twi_rxBuffer[3]) + twi_rxBuffer[4] / 256.0);
 		break;
 	case 0x10: // SET OSCILLATOR TO SQUARE WAVE
 		for (uint16_t b = 0; b < 256; b++) {
@@ -104,6 +106,12 @@ void arpeggio_play_note(uint8_t note)
 int main(void)
 {
 
+	for (uint8_t o = 0; o < AVRSOUND_MAX_CHANNELS; o++) {
+		channel_fading[o] = 0;
+		fade_start_volume[o] = 0;
+		fade_time[o] = 0;
+		fade_cursor[o] = 0;
+	}
 	for (float i = 0; i < 140; i += 1.0) {
 		midi[(uint8_t)(i)] = pow(2.0, (i - 69.0) * 0.083333) * 440.0;
 	}
@@ -117,12 +125,17 @@ int main(void)
 
 	avrsound_init();
 	avrsound_sample_init(256, 440.0);
+	avrsound_set_samplerate(20000);
 
 	for (uint16_t b = 0; b < 256; b++) {
 		avrsound_setbuffer(b, b - 128); // SINE WAVE
 	}
 
+	init_arp_timer();
+	sei();
+
 	while (1) {
+
 
 	}
 	return 0;
