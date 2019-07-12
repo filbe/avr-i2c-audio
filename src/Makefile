@@ -19,7 +19,7 @@ PRJ = main
 # avr mcu
 MCU = atmega328p
 # mcu clock frequency
-F_CPU = 16000000
+F_CPU = 20000000
 
 ifndef DEVICE_ID
 $(DEVICE_ID is set to 1)

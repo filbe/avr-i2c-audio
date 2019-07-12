@@ -125,17 +125,22 @@ int main(void)
 
 	avrsound_init();
 	avrsound_sample_init(256, 440.0);
-	avrsound_set_samplerate(20000);
+	avrsound_set_samplerate(16000);
 
 	for (uint16_t b = 0; b < 256; b++) {
-		avrsound_setbuffer(b, b - 128); // SINE WAVE
-	}
+		avrsound_setbuffer(b, sin(2.0*3.14159265*(float)(b)/256.0)*126.5+127.5); // SINE WAVE
+		avrsound_setbuffer(b, b - 128);
+		avrsound_setbuffer(b, (b < 128) ? 255 : 0);
 
-	init_arp_timer();
+	}
+	avrsound_set_hz(1,300);
+
 	sei();
 
-	while (1) {
+	
 
+	while (1) {
+		
 
 	}
 	return 0;
