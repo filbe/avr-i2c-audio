@@ -129,11 +129,20 @@ int main(void)
 
 	for (uint16_t b = 0; b < 256; b++) {
 		avrsound_setbuffer(b, sin(2.0*3.14159265*(float)(b)/256.0)*126.5+127.5); // SINE WAVE
-		avrsound_setbuffer(b, b - 128);
-		avrsound_setbuffer(b, (b < 128) ? 255 : 0);
+		//avrsound_setbuffer(b, b - 128);
+		//avrsound_setbuffer(b, (b < 128) ? 255 : 0);
 
 	}
-	avrsound_set_hz(1,300);
+
+	avrsound_set_volume(1, 120);avrsound_set_hz(1,256);
+	//avrsound_set_volume(2, 60);avrsound_set_hz(2,75);
+
+	
+	
+	
+	//avrsound_set_hz(0,600);
+
+	adc_init();
 
 	sei();
 

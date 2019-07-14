@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr-sound.h>
 #include "arpeggio.h"
 #include "avr-i2c-audio.h"
 
@@ -14,7 +15,7 @@ volatile uint8_t arp_notes_count = 0;
 volatile uint8_t arp_delay_between_notes = 0;
 volatile uint32_t arpeggio_time = 0;
 volatile uint8_t arpeggio_cursor = 0;
-volatile arpeggio_on = 0;
+volatile uint8_t arpeggio_on = 0;
 
 
 void arpeggio_play_note(uint8_t note);
