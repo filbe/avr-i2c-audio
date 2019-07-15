@@ -1,7 +1,7 @@
 #include <avr-i2c-audio.h>
 
 
-float midi[140];
+float midi[120];
 volatile uint8_t channel_fading[AVRSOUND_MAX_CHANNELS];
 
 #define CHANNEL_FADE_SETTING	3
@@ -31,7 +31,7 @@ void receive_i2c()
 				avrsound_set_hz(channel, 0);
 			}
 		} else {
-			
+
 			if (channel_settings & (1 << CHANNEL_FADE_SETTING)) {
 			} else {
 				avrsound_set_hz(channel, 0);
@@ -112,7 +112,7 @@ int main(void)
 		fade_time[o] = 0;
 		fade_cursor[o] = 0;
 	}
-	for (float i = 0; i < 140; i += 1.0) {
+	for (float i = 0; i < 120; i += 1.0) {
 		midi[(uint8_t)(i)] = pow(2.0, (i - 69.0) * 0.083333) * 440.0;
 	}
 
@@ -125,31 +125,44 @@ int main(void)
 
 	avrsound_init();
 	avrsound_sample_init(256, 440.0);
-	avrsound_set_samplerate(16000);
+	avrsound_set_samplerate(15000);
 
 	for (uint16_t b = 0; b < 256; b++) {
-		avrsound_setbuffer(b, sin(2.0*3.14159265*(float)(b)/256.0)*126.5+127.5); // SINE WAVE
-		//avrsound_setbuffer(b, b - 128);
+		avrsound_setbuffer(b, sin(2.0 * 3.14159265 * (float)(b) / 256.0) * 126.5 + 127.5); // SINE WAVE
+		//avrsound_setbuffer(b, b);
+		//else avrsound_setbuffer(b, 256 - (b - 128));
 		//avrsound_setbuffer(b, (b < 128) ? 255 : 0);
 
 	}
 
-	avrsound_set_volume(1, 120);avrsound_set_hz(1,256);
+	uint8_t notestoplay[] = {
+		62,57,69,70,62,67,69,62,65,67,62,64,65,60,
+		62,57,69,70,62,67,69,62,72,62,70,62,67,69,
+		62,57,69,70,62,67,69,62,65,67,65,64,62,60,
+		58,53,65,58,65,67,58,65,55,64,60,55,65,64,60,57
+	};
+
+	avrsound_set_volume(0, 120); //avrsound_set_volume(1, 30); avrsound_set_hz(1, 256);
 	//avrsound_set_volume(2, 60);avrsound_set_hz(2,75);
 
-	
-	
-	
+
+
+
 	//avrsound_set_hz(0,600);
 
 	adc_init();
 
 	sei();
 
-	
+
 
 	while (1) {
-		
+		for (uint8_t i = 0; i < sizeof(notestoplay); i++) {
+			avrsound_set_hz(0, midi[notestoplay[i]]);
+			_delay_ms(25);
+			//avrsound_set_hz(0, midi[0]);
+			//_delay_ms(20);
+		}
 
 	}
 	return 0;
